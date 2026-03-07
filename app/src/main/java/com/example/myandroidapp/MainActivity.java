@@ -17,24 +17,54 @@ import java.util.Calendar;
 
 import android.app.TimePickerDialog;
 
+import androidx.room.Room;
+
+import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+
+    AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        db = Room.databaseBuilder(
+                getApplicationContext(),
+                AppDatabase.class,
+                "task-database"
+        ).allowMainThreadQueries().build();
+
+        Button saveButton = findViewById(R.id.saveTaskButton);
+
+        saveButton.setOnClickListener(v -> {
+
+            EditText title = findViewById(R.id.taskTitleView);
+            EditText description = findViewById(R.id.taskDescriptionView);
+            EditText date = findViewById(R.id.taskDueDateView);
+            EditText time = findViewById(R.id.taskDueTimeView);
+
+            Task task = new Task();
+
+            task.title = title.getText().toString();
+            task.description = description.getText().toString();
+            task.dueDate = date.getText().toString();
+            task.dueTime = time.getText().toString();
+
+            db.taskDao().insert(task);
+
+            Toast.makeText(this, "Task Saved!", Toast.LENGTH_SHORT).show();
+            Log.d("ToDoApp","Save button clicked");
+        });
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-    }
-    public void onSaveClick(View view) {
-
-        Log.d("ToDoApp","Save button clicked");
-
     }
 
     public void openDatePicker(View view){
@@ -69,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 this,
                 (timePicker, h, m) -> {
                     EditText timeInput = findViewById(R.id.taskDueTimeView);
-                    timeInput.setText(h + ":" + m);
+                    timeInput.setText(String.format("%02d:%02d", h, m));
                 },
                 hour, minute, true
         );
