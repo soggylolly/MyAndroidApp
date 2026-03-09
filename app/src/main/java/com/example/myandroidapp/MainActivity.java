@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Task Saved!", Toast.LENGTH_SHORT).show();
             Log.d("ToDoApp","Save button clicked");
+
+            finish();
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
