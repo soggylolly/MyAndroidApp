@@ -63,7 +63,7 @@ public class ToDoListActivity extends AppCompatActivity {
     public void openNewTask(View view) {
         Log.d("ToDoAPP", "onNewTaskClicked");
 
-        Intent intent = new Intent(this, ToDoListActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
 
 
