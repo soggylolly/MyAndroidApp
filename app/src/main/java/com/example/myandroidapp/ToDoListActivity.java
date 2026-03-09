@@ -53,7 +53,7 @@ public class ToDoListActivity extends AppCompatActivity {
         for (Task task : tasks) {
 
             TextView textView = new TextView(this);
-            textView.setText(task.title);
+            textView.setText(task.title + "\nDue: " + task.dueDate + " " + task.dueTime);
 
             taskListLayout.addView(textView);
 
