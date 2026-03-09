@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 
 import java.util.List;
@@ -60,9 +61,12 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     public void openNewTask(View view) {
+        Log.d("ToDoAPP", "onNewTaskClicked");
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, ToDoListActivity.class);
         startActivity(intent);
+
+
 
     }
 
