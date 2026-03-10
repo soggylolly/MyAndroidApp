@@ -3,6 +3,7 @@ package com.example.myandroidapp;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -13,6 +14,7 @@ import android.view.View;
 
 import android.widget.EditText;
 import android.app.DatePickerDialog;
+
 import java.util.Calendar;
 
 import android.app.TimePickerDialog;
@@ -22,9 +24,23 @@ import androidx.room.Room;
 import android.widget.Button;
 import android.widget.Toast;
 
+import android.content.Intent;
+import android.net.Uri;
+import androidx.activity.result.ActivityResultLauncher;
+
+import androidx.activity.result.contract.ActivityResultContracts;
+import android.widget.ImageView;
+
+import java.io.File;
+import android.provider.MediaStore;
+import androidx.core.content.FileProvider;
+
 public class MainActivity extends AppCompatActivity {
 
     AppDatabase db;
+
+    Uri imageUri;
+    ActivityResultLauncher<Intent> cameraLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
             task.dueDate = date.getText().toString();
             task.dueTime = time.getText().toString();
 
+            if(imageUri != null){
+                task.imageUri = imageUri.toString();
+            }
+
             db.taskDao().insert(task);
 
             Toast.makeText(this, "Task Saved!", Toast.LENGTH_SHORT).show();
@@ -68,6 +88,20 @@ public class MainActivity extends AppCompatActivity {
             finish();
         });
 
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+
+                    if (result.getResultCode() == RESULT_OK) {
+
+                        ImageView imageView = findViewById(R.id.imageView);
+                        imageView.setImageURI(imageUri);
+
+                        Log.d("Camera", "Image captured");
+
+                    }
+
+                });
 
     }
 
@@ -109,5 +143,25 @@ public class MainActivity extends AppCompatActivity {
         );
 
         dialog.show();
+    }
+
+    public void onCameraClick(View view) {
+
+        File imageFile = new File(
+                getFilesDir(),
+                System.currentTimeMillis() + ".jpg"
+        );
+
+        imageUri = FileProvider.getUriForFile(
+                this,
+                getPackageName() + ".fileprovider",
+                imageFile
+        );
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+        cameraLauncher.launch(cameraIntent);
+
     }
 }

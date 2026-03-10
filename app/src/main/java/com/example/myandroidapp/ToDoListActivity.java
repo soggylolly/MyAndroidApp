@@ -13,9 +13,13 @@ import android.util.Log;
 import android.view.View;
 
 import java.util.List;
+
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import androidx.room.Room;
+
+import android.widget.ImageView;
+import android.net.Uri;
 
 public class ToDoListActivity extends AppCompatActivity {
 
@@ -52,11 +56,21 @@ public class ToDoListActivity extends AppCompatActivity {
 
         for (Task task : tasks) {
 
-            TextView textView = new TextView(this);
-            textView.setText(task.title + "\nDue: " + task.dueDate + " " + task.dueTime);
+            View taskView = getLayoutInflater().inflate(R.layout.task_layout, null);
 
-            taskListLayout.addView(textView);
+            ImageView imageView = taskView.findViewById(R.id.taskListImage);
+            TextView title = taskView.findViewById(R.id.taskListTitle);
+            TextView desc = taskView.findViewById(R.id.taskListDesc);
 
+            title.setText(task.title);
+            desc.setText(task.description);
+
+            if(task.imageUri != null){
+                Uri uri = Uri.parse(task.imageUri);
+                imageView.setImageURI(uri);
+            }
+
+            taskListLayout.addView(taskView);
         }
     }
 
