@@ -18,6 +18,12 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     List<Task> tasks;
 
+    AppDatabase db;
+
+    public TaskListAdapter(AppDatabase db){
+        this.db = db;
+    }
+
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
         notifyDataSetChanged();
@@ -63,6 +69,8 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
             task.done = isChecked;
 
+            db.taskDao().update(task);
+
         });
 
         if(task.imageUri != null){
@@ -79,5 +87,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
         }
 
         return tasks.size();
+    }
+
+    public void deleteTask(int position){
+
+        Task task = tasks.get(position);
+        db.taskDao().delete(task);
+        tasks.remove(position);
+        notifyItemRemoved(position);
+
     }
 }

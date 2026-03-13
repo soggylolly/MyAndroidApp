@@ -19,6 +19,8 @@ import androidx.room.Room;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import androidx.recyclerview.widget.ItemTouchHelper;
+
 public class ToDoListActivity extends AppCompatActivity {
 
     AppDatabase db;
@@ -46,9 +48,29 @@ public class ToDoListActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new TaskListAdapter();
+        adapter = new TaskListAdapter(db);
 
         recyclerView.setAdapter(adapter);
+
+        ItemTouchHelper.SimpleCallback callback =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                        int position = viewHolder.getAdapterPosition();
+                        adapter.deleteTask(position);
+
+                    }
+                };
+
+        ItemTouchHelper helper = new ItemTouchHelper(callback);
+        helper.attachToRecyclerView(recyclerView);
     }
 
     @Override
