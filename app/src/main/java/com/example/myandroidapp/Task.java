@@ -14,6 +14,7 @@ public class Task {
     public String dueDate;
     public String dueTime;
 
+    public boolean done;
     public String imageUri;
 
 

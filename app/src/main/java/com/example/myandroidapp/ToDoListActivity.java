@@ -14,17 +14,16 @@ import android.view.View;
 
 import java.util.List;
 
-import android.widget.TextView;
-import android.widget.LinearLayout;
 import androidx.room.Room;
 
-import android.widget.ImageView;
-import android.net.Uri;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class ToDoListActivity extends AppCompatActivity {
 
     AppDatabase db;
-    LinearLayout taskListLayout;
+    RecyclerView recyclerView;
+    TaskListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,35 +42,21 @@ public class ToDoListActivity extends AppCompatActivity {
                 "task-database"
         ).allowMainThreadQueries().build();
 
-        taskListLayout = findViewById(R.id.taskListLayout);
+        recyclerView = findViewById(R.id.taskRecyclerView);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new TaskListAdapter();
+
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        taskListLayout.removeAllViews();
-
         List<Task> tasks = db.taskDao().getAllTasks();
-
-        for (Task task : tasks) {
-
-            View taskView = getLayoutInflater().inflate(R.layout.task_layout, null);
-
-            ImageView imageView = taskView.findViewById(R.id.taskListImage);
-            TextView title = taskView.findViewById(R.id.taskListTitle);
-            TextView desc = taskView.findViewById(R.id.taskListDesc);
-
-            title.setText(task.title);
-            desc.setText(task.description);
-
-            if(task.imageUri != null){
-                Uri uri = Uri.parse(task.imageUri);
-                imageView.setImageURI(uri);
-            }
-
-            taskListLayout.addView(taskView);
-        }
+        adapter.setTasks(tasks);
     }
 
     public void openNewTask(View view) {
