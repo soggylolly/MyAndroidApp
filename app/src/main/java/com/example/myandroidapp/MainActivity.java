@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         (camera) to write the image file. */
         imageUri = FileProvider.getUriForFile(
                 this,
-                getPackageName() + ".file provider",
+                getPackageName() + ".fileprovider",
                 imageFile
         );
 
