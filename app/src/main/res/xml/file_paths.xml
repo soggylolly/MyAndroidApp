@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!-- file_paths.xml defines which directories inside the application can be
+shared with other apps using FileProvider. This is required when the app
+captures images using the device camera. -->
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- files-path allows FileProvider to access files stored inside the
+    application's internal storage directory.
+     - name="images" is an identifier for path.
+     - path="." means root of application files directory will be accessible for sharing. -->
     <files-path
         name="images"
         path="." />

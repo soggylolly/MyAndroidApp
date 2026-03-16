@@ -11,25 +11,42 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyAndroidApp">
+
+        <!-- MainActivity is used to create a new task.
+         android:exported="false" means this activity can only be opened
+         from inside the application. -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
+        <!-- ToDoListActivity displays the list of tasks.
+        It is marked as the launcher activity, meaning it is the first screen shown
+        when the application starts. -->
         <activity
             android:name=".ToDoListActivity"
             android:exported="true">
+
+            <!-- Intent filter defines how the activity is launched -->
             <intent-filter>
+                <!-- Marks this activity as the main entry point -->
                 <action android:name="android.intent.action.MAIN" />
 
+                <!-- Makes the app appear in the device launcher -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- FileProvider is required to securely share files between the application
+         and other apps such as the device camera.
+         It is used when capturing images for tasks. -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
 
+            <!-- Links the provider to the file_paths.xml configuration
+             which defines where files can be shared from. -->
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"/>
