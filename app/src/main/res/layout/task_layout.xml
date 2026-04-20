@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!-- task_layout.xml defines the layout for a single task item displayed inside the
+RecyclerView in ToDoListActivity.
+Each task item includes:
+- an optional image
+- task title
+- task description
+- a checkbox to mark the task as completed -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -7,6 +14,8 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
+    <!-- ImageView displays the photo associated with the task.
+    The image is loaded from the URI stored in the database. -->
     <ImageView
         android:id="@+id/taskListImage"
         android:layout_width="wrap_content"
@@ -14,12 +23,15 @@
         android:adjustViewBounds="true"
         android:layout_marginEnd="8dp"/>
 
+    <!-- Vertical layout used to display the task text content
+    (title, description, and completion checkbox). -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical">
 
+        <!-- Displays the title of the task -->
         <TextView
             android:id="@+id/taskListTitle"
             android:layout_width="wrap_content"
@@ -28,11 +40,13 @@
             android:textSize="16sp"
             android:layout_marginBottom="4dp"/>
 
+        <!-- Displays the description of the task -->
         <TextView
             android:id="@+id/taskListDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <!-- Checkbox used to mark the task as completed -->
         <CheckBox
             android:id="@+id/taskListDone"
             android:layout_width="wrap_content"

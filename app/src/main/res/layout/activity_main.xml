@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- activity_main.xml defines the user interface for MainActivity.
+This screen allows users to create a new task by entering:
+- title
+- description
+- due date
+- due time
+- optional image captured from the camera -->
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,6 +18,7 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
+    <!-- Label for the task title field -->
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
@@ -18,6 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <!-- Input field where the user enters the task title -->
     <EditText
         android:id="@+id/taskTitleView"
         android:layout_width="0dp"
@@ -28,6 +39,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"/>
 
+    <!-- Label for task description -->
     <TextView
         android:id="@+id/description"
         android:layout_width="wrap_content"
@@ -36,6 +48,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/taskTitleView"/>
 
+    <!-- Multi-line text field where users describe the task -->
     <EditText
         android:id="@+id/taskDescriptionView"
         android:layout_width="0dp"
@@ -48,6 +61,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description"/>
 
+    <!-- Label for selecting a due date -->
     <TextView
         android:id="@+id/dueDate"
         android:layout_width="wrap_content"
@@ -56,6 +70,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/taskDescriptionView"/>
 
+    <!-- Date input field that triggers the DatePicker dialog -->
     <EditText
         android:id="@+id/taskDueDateView"
         android:layout_width="0dp"
@@ -68,6 +83,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dueDate"/>
 
+    <!-- Label for selecting due time -->
     <TextView
         android:id="@+id/dueTime"
         android:layout_width="wrap_content"
@@ -76,6 +92,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/taskDueDateView"/>
 
+    <!-- Time input field that triggers the TimePicker dialog -->
     <EditText
         android:id="@+id/taskDueTimeView"
         android:layout_width="0dp"
@@ -89,7 +106,7 @@
         app:layout_constraintTop_toBottomOf="@+id/dueTime" />
 
 
-
+    <!-- Button used to save the task to the database -->
     <Button
         android:id="@+id/saveTaskButton"
         android:layout_width="0dp"
@@ -99,6 +116,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
+    <!-- Camera button used to capture an image for the task -->
     <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="wrap_content"
@@ -111,6 +129,7 @@
         app:layout_constraintTop_toBottomOf="@+id/taskDueTimeView"
         app:srcCompat="@android:drawable/ic_menu_camera" />
 
+    <!-- ImageView displays the captured photo associated with the task -->
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="410dp"

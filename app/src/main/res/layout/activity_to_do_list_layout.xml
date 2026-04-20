@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- activity_to_do_list_layout.xml defines the main screen of the application.
+This screen displays all tasks stored in the database using a RecyclerView.
+It also contains a FloatingActionButton that allows the user to create a new task. -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,36 +12,33 @@
     android:fitsSystemWindows="true"
     tools:context=".ToDoListActivity">
 
-    <FrameLayout
-        android:id="@+id/fragmentContainer"
+    <!-- RecyclerView displays the list of tasks retrieved from the Room database.
+    It dynamically generates list items using the TaskListAdapter and the task_layout.xml file. -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/taskRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-
         android:layout_marginTop="?attr/actionBarSize"
 
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:menu="@menu/bottom_nav_menu"/>
-
+    <!-- FloatingActionButton used to create a new task.
+    When pressed it calls the openNewTask() method in ToDoListActivity,
+    which launches MainActivity. -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/newTaskButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="openNewTask"
+
         app:srcCompat="@android:drawable/ic_input_add"
 
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"/>
+
+        android:layout_margin="24dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
