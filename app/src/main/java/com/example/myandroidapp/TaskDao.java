@@ -24,4 +24,10 @@ public interface TaskDao {
     @Delete
     void delete(Task task);
 
+    @Query("SELECT * FROM Task WHERE done = 1")
+    List<Task> getCompletedTasks();
+
+    @Query("SELECT * FROM Task WHERE done = 0")
+    List<Task> getPendingTasks();
+
 }

@@ -1,95 +1,77 @@
 package com.example.myandroidapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import android.content.Intent;
-import android.util.Log;
-import android.view.View;
+import androidx.fragment.app.Fragment;
 
-import java.util.List;
-
-import androidx.room.Room;
-
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import androidx.recyclerview.widget.ItemTouchHelper;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ToDoListActivity extends AppCompatActivity {
 
-    AppDatabase db;
-    RecyclerView recyclerView;
-    TaskListAdapter adapter;
+    // ✅ Fragments from worksheet
+    AllTaskFragment allTaskFragment = new AllTaskFragment();
+    CompletedTaskFragment completedTaskFragment = new CompletedTaskFragment();
+    PendingTaskFragment pendingTaskFragment = new PendingTaskFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_to_do_list_layout);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        db = Room.databaseBuilder(
-                getApplicationContext(),
-                AppDatabase.class,
-                "task-database"
-        ).allowMainThreadQueries().build();
+        // ✅ Default fragment (All Tasks)
+        loadFragment(allTaskFragment);
 
-        recyclerView = findViewById(R.id.taskRecyclerView);
+        // ✅ Bottom Navigation
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        bottomNav.setOnItemSelectedListener(item -> {
 
-        adapter = new TaskListAdapter(db);
+            if (item.getItemId() == R.id.nav_all) {
+                loadFragment(allTaskFragment);
+                return true;
+            }
 
-        recyclerView.setAdapter(adapter);
+            if (item.getItemId() == R.id.nav_completed) {
+                loadFragment(completedTaskFragment);
+                return true;
+            }
 
-        ItemTouchHelper.SimpleCallback callback =
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            if (item.getItemId() == R.id.nav_pending) {
+                loadFragment(pendingTaskFragment);
+                return true;
+            }
 
-                    @Override
-                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-
-                        int position = viewHolder.getAdapterPosition();
-                        adapter.deleteTask(position);
-
-                    }
-                };
-
-        ItemTouchHelper helper = new ItemTouchHelper(callback);
-        helper.attachToRecyclerView(recyclerView);
+            return false;
+        });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        List<Task> tasks = db.taskDao().getAllTasks();
-        adapter.setTasks(tasks);
+    // ✅ REQUIRED METHOD (worksheet)
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .commit();
     }
 
     public void openNewTask(View view) {
-        Log.d("ToDoAPP", "onNewTaskClicked");
-
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-
-
-
     }
-
-
 }

@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
         imageUri = FileProvider.getUriForFile(
                 this,
-                getPackageName() + ".file provider",
+                getPackageName() + ".fileprovider",
                 imageFile
         );
 
