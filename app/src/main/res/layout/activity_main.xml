@@ -1,147 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- activity_main.xml defines the user interface for MainActivity.
-This screen allows users to create a new task by entering:
-- title
-- description
-- due date
-- due time
-- optional image captured from the camera -->
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <!-- Label for the task title field -->
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Title"
-        android:layout_marginTop="?attr/actionBarSize"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:orientation="vertical"
+        android:padding="12dp">
 
-    <!-- Input field where the user enters the task title -->
-    <EditText
-        android:id="@+id/taskTitleView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Task Title"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title"/>
+        <TextView
+            android:id="@+id/formTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Reminder"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
-    <!-- Label for task description -->
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Description"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/taskTitleView"/>
+        <EditText
+            android:id="@+id/taskTitleView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title" />
 
-    <!-- Multi-line text field where users describe the task -->
-    <EditText
-        android:id="@+id/taskDescriptionView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Description of Task"
-        android:gravity="start|top"
-        android:inputType="textMultiLine"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/description"/>
+        <EditText
+            android:id="@+id/taskDescriptionView"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:gravity="top"
+            android:hint="Description" />
 
-    <!-- Label for selecting a due date -->
-    <TextView
-        android:id="@+id/dueDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Due Date"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/taskDescriptionView"/>
+        <EditText
+            android:id="@+id/taskDueDateView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="Due Date"
+            android:onClick="openDatePicker" />
 
-    <!-- Date input field that triggers the DatePicker dialog -->
-    <EditText
-        android:id="@+id/taskDueDateView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="dd/mm/yyyy"
-        android:clickable="true"
-        android:focusable="false"
-        android:onClick="openDatePicker"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dueDate"/>
+        <EditText
+            android:id="@+id/taskDueTimeView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="Due Time"
+            android:onClick="openTimePicker" />
 
-    <!-- Label for selecting due time -->
-    <TextView
-        android:id="@+id/dueTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Due Time"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/taskDueDateView"/>
+        <Button
+            android:id="@+id/imageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onCameraClick"
+            android:text="Take Photo" />
 
-    <!-- Time input field that triggers the TimePicker dialog -->
-    <EditText
-        android:id="@+id/taskDueTimeView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="false"
-        android:hint="00:00"
-        android:onClick="openTimePicker"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dueTime" />
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#DDDDDD"
+            android:scaleType="fitCenter" />
 
+        <Button
+            android:id="@+id/locationButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="saveCurrentLocation"
+            android:text="Use Current Location" />
 
-    <!-- Button used to save the task to the database -->
-    <Button
-        android:id="@+id/saveTaskButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        <Button
+            android:id="@+id/mapButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="openMap"
+            android:text="Choose Location On Map" />
 
-    <!-- Camera button used to capture an image for the task -->
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onCameraClick"
-        android:layout_marginTop="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/taskDueTimeView"
-        app:srcCompat="@android:drawable/ic_menu_camera" />
+        <TextView
+            android:id="@+id/locationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="No location saved" />
 
-    <!-- ImageView displays the captured photo associated with the task -->
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="410dp"
-        android:layout_height="310dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/saveTaskButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageButton"
-        app:layout_constraintVertical_bias="1.0"
-        tools:srcCompat="@tools:sample/avatars" />
+        <Button
+            android:id="@+id/saveTaskButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Reminder" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-
+    </LinearLayout>
+</ScrollView>

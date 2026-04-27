@@ -1,46 +1,37 @@
 package com.example.myandroidapp;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
-import androidx.room.Update;
-import androidx.room.Delete;
-/* Task class represents the data model for a task in the ToDo application
-@Entity means that this class should be stored as a
-table in the application's SQLite database. */
-
-/* TaskDao (Data Access Object) defines how the application interacts with the Room database.
- It acts as an interface between the code and SQLite database.*/
 @Dao
 public interface TaskDao {
 
-    /* This query retrieves all tasks stored in the database.
-    - Retrieve every column
-    - From the Task table
-    The result is returned as a List of Task objects. */
-
-    @Query("SELECT * FROM Task")
+    @Query("SELECT * FROM Task ORDER BY id DESC")
     List<Task> getAllTasks();
 
-    // Inserts a new task into the database.
+    @Query("SELECT * FROM Task WHERE shared = 0 ORDER BY id DESC")
+    List<Task> getMyTasks();
+
+    @Query("SELECT * FROM Task WHERE shared = 1 ORDER BY id DESC")
+    List<Task> getSharedTasks();
+
+    @Query("SELECT * FROM Task WHERE id = :id LIMIT 1")
+    Task getTaskById(int id);
+
+    @Query("SELECT * FROM Task WHERE remoteId = :remoteId LIMIT 1")
+    Task getTaskByRemoteId(String remoteId);
+
     @Insert
     void insert(Task task);
 
-    // Updates an existing task in the database.
     @Update
     void update(Task task);
 
-    // Deletes a task from the database.
     @Delete
     void delete(Task task);
-
-    @Query("SELECT * FROM Task WHERE done = 1")
-    List<Task> getCompletedTasks();
-
-    @Query("SELECT * FROM Task WHERE done = 0")
-    List<Task> getPendingTasks();
-
 }

@@ -1,213 +1,252 @@
 package com.example.myandroidapp;
 
-import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import android.util.Log;
-import android.view.View;
-
-import android.widget.EditText;
+import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
-
-import java.util.Calendar;
-
 import android.app.TimePickerDialog;
-
-import androidx.room.Room;
-
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import android.content.Intent;
-import android.net.Uri;
 import androidx.activity.result.ActivityResultLauncher;
-
 import androidx.activity.result.contract.ActivityResultContracts;
-import android.widget.ImageView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.room.Room;
 
 import java.io.File;
-import android.provider.MediaStore;
-import androidx.core.content.FileProvider;
-/* The above imports are used to allow for code to use classes, methods, and resources
- from other packages already available in android studio without the need to make all
-  code from scratch */
+import java.util.Calendar;
 
-/* The Mainactivity class is used for creating new tasks in the application */
 public class MainActivity extends AppCompatActivity {
 
-    // Reference to the Room database used to store tasks
+    private static final int LOCATION_PERMISSION_CODE = 33;
+
     AppDatabase db;
-
-    // URI used to store the location of a captured image
+    Task editingTask;
     Uri imageUri;
+    double latitude;
+    double longitude;
+    boolean hasLocation;
 
-    // Launcher used to open the camera and receive the result
+    EditText titleInput;
+    EditText descriptionInput;
+    EditText dueDateInput;
+    EditText dueTimeInput;
+    TextView locationText;
+    ImageView imageView;
     ActivityResultLauncher<Intent> cameraLauncher;
+    ActivityResultLauncher<Intent> mapLauncher;
 
-    /* onCreate() is called when the activity is first created.
-    This is where the layout is loaded and the app components are initialised. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Enables edge-to-edge layout
-        EdgeToEdge.enable(this);
-
-        // Loads the activity_main.xml layout
         setContentView(R.layout.activity_main);
 
-        /* Ensures the layout adjusts correctly around system bars
-         (such as the status bar and navigation bar). */
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        db = Room.databaseBuilder(this, AppDatabase.class, "task-database")
+                .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
+                .build();
 
-        /* Creates the Room database instance. */
-        db = Room.databaseBuilder(
-                getApplicationContext(),
-                AppDatabase.class,
-                "task-database"
-        ).allowMainThreadQueries().build();
-
-        // Retrieve the save task button from the UI layout
+        titleInput = findViewById(R.id.taskTitleView);
+        descriptionInput = findViewById(R.id.taskDescriptionView);
+        dueDateInput = findViewById(R.id.taskDueDateView);
+        dueTimeInput = findViewById(R.id.taskDueTimeView);
+        locationText = findViewById(R.id.locationText);
+        imageView = findViewById(R.id.imageView);
         Button saveButton = findViewById(R.id.saveTaskButton);
 
-        /* Event listener triggered when the Save Task button is clicked.
-        This collects user input and stores the task in the database. */
-        saveButton.setOnClickListener(v -> {
-
-            // Retrieve the text fields where the user enters task details
-            EditText title = findViewById(R.id.taskTitleView);
-            EditText description = findViewById(R.id.taskDescriptionView);
-            EditText date = findViewById(R.id.taskDueDateView);
-            EditText time = findViewById(R.id.taskDueTimeView);
-
-            // Create a new Task object
-            Task task = new Task();
-
-            // Store user input into the task object
-            task.title = title.getText().toString();
-            task.description = description.getText().toString();
-            task.dueDate = date.getText().toString();
-            task.dueTime = time.getText().toString();
-
-            // If the user captured an image, store the image URI
-            if(imageUri != null){
-                task.imageUri = imageUri.toString();
-            }
-
-            // Insert the task into the database using the DAO
-            db.taskDao().insert(task);
-
-            // Display confirmation message
-            Toast.makeText(this, "Task Saved!", Toast.LENGTH_SHORT).show();
-
-            // Log message for debugging
-            Log.d("ToDoApp","Save button clicked");
-
-            // Close the activity after saving the task
-            finish();
-        });
-
-        /* Register a camera activity launcher.
-        This allows the app to open the device camera and receive the captured image. */
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-
-                    // Check if the camera successfully captured an image
-                    if (result.getResultCode() == RESULT_OK) {
-
-                        // Display the captured image in the ImageView
-                        ImageView imageView = findViewById(R.id.imageView);
+                    if (result.getResultCode() == Activity.RESULT_OK && imageUri != null) {
                         imageView.setImageURI(imageUri);
-
-                        Log.d("Camera", "Image captured");
-
                     }
-
-                });
-
-    }
-
-    /* Opens a DatePicker dialog allowing the user to select a due date for the task. */
-    public void openDatePicker(View view){
-
-        Calendar calendar = Calendar.getInstance();
-
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog dialog = new DatePickerDialog(
-                this,
-                (datePicker, y, m, d) -> {
-
-                    // Insert the selected date into the text field
-                    EditText dateInput = findViewById(R.id.taskDueDateView);
-                    dateInput.setText(d + "/" + (m+1) + "/" + y);
-
-                },
-                year, month, day
+                }
         );
 
-        dialog.show();
-    }
-
-    /* Opens a TimePicker dialog allowing the user to select a due time for the task. */
-    public void openTimePicker(View view) {
-
-        Calendar calendar = Calendar.getInstance();
-
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-
-        TimePickerDialog dialog = new TimePickerDialog(
-                this,
-                (timePicker, h, m) -> {
-                    // Insert selected time into the text field
-                    EditText timeInput = findViewById(R.id.taskDueTimeView);
-                    timeInput.setText(String.format("%02d:%02d", h, m));
-                },
-                hour, minute, true
+        mapLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        latitude = result.getData().getDoubleExtra("latitude", 0);
+                        longitude = result.getData().getDoubleExtra("longitude", 0);
+                        hasLocation = true;
+                        updateLocationText();
+                    }
+                }
         );
 
-        dialog.show();
+        int taskId = getIntent().getIntExtra("taskId", -1);
+        if (taskId != -1) {
+            editingTask = db.taskDao().getTaskById(taskId);
+            loadTaskForEditing();
+        }
+
+        saveButton.setOnClickListener(v -> saveReminder());
     }
 
-    /* Launches the device camera so the user can capture an image related to the task. */
+    private void loadTaskForEditing() {
+        if (editingTask == null) {
+            return;
+        }
+
+        TextView formTitle = findViewById(R.id.formTitle);
+        formTitle.setText("Edit Reminder");
+
+        titleInput.setText(editingTask.title);
+        descriptionInput.setText(editingTask.description);
+        dueDateInput.setText(editingTask.dueDate);
+        dueTimeInput.setText(editingTask.dueTime);
+        latitude = editingTask.latitude;
+        longitude = editingTask.longitude;
+        hasLocation = editingTask.hasLocation;
+
+        if (editingTask.imageUri != null && !editingTask.imageUri.isEmpty()) {
+            imageUri = Uri.parse(editingTask.imageUri);
+            imageView.setImageURI(imageUri);
+        }
+
+        updateLocationText();
+    }
+
+    private void saveReminder() {
+        String title = titleInput.getText().toString().trim();
+        String description = descriptionInput.getText().toString().trim();
+        String dueDate = dueDateInput.getText().toString().trim();
+        String dueTime = dueTimeInput.getText().toString().trim();
+
+        if (title.isEmpty()) {
+            titleInput.setError("Title needed");
+            return;
+        }
+
+        if (!hasLocation) {
+            Toast.makeText(this, "Please save a location", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Task task = editingTask == null ? new Task() : editingTask;
+        task.title = title;
+        task.description = description;
+        task.dueDate = dueDate;
+        task.dueTime = dueTime;
+        task.latitude = latitude;
+        task.longitude = longitude;
+        task.hasLocation = hasLocation;
+        task.shared = false;
+        task.owner = "Me";
+        task.notified = false;
+
+        if (imageUri != null) {
+            task.imageUri = imageUri.toString();
+        }
+
+        if (editingTask == null) {
+            db.taskDao().insert(task);
+        } else {
+            db.taskDao().update(task);
+        }
+
+        Toast.makeText(this, "Reminder saved", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
     public void onCameraClick(View view) {
-
-        // Create a file where the captured image will be stored
-        File imageFile = new File(
-                getFilesDir(),
-                System.currentTimeMillis() + ".jpg"
-        );
-
-        /* FileProvider generates a secure URI allowing external apps
-        (camera) to write the image file. */
+        File imageFile = new File(getFilesDir(), System.currentTimeMillis() + ".jpg");
         imageUri = FileProvider.getUriForFile(
                 this,
                 getPackageName() + ".fileprovider",
                 imageFile
         );
 
-        // Create an intent to launch the device camera
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        // Tell the camera where to save the captured image
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-
-        // Launch the camera
         cameraLauncher.launch(cameraIntent);
+    }
 
+    public void openDatePicker(View view) {
+        Calendar calendar = Calendar.getInstance();
+
+        DatePickerDialog dialog = new DatePickerDialog(
+                this,
+                (datePicker, year, month, day) ->
+                        dueDateInput.setText(day + "/" + (month + 1) + "/" + year),
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        dialog.show();
+    }
+
+    public void openTimePicker(View view) {
+        Calendar calendar = Calendar.getInstance();
+
+        TimePickerDialog dialog = new TimePickerDialog(
+                this,
+                (timePicker, hour, minute) ->
+                        dueTimeInput.setText(String.format("%02d:%02d", hour, minute)),
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+        );
+
+        dialog.show();
+    }
+
+    public void saveCurrentLocation(View view) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION_CODE
+            );
+            return;
+        }
+
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location location = null;
+
+        if (locationManager != null) {
+            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location == null) {
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+        }
+
+        if (location == null) {
+            Toast.makeText(this, "Location not found. Try again outside.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        hasLocation = true;
+        updateLocationText();
+    }
+
+    public void openMap(View view) {
+        mapLauncher.launch(new Intent(this, LocationPickerActivity.class));
+    }
+
+    private void updateLocationText() {
+        if (hasLocation) {
+            locationText.setText("Location: " + latitude + ", " + longitude);
+        } else {
+            locationText.setText("No location saved");
+        }
     }
 }

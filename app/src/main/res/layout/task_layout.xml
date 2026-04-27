@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- task_layout.xml defines the layout for a single task item displayed inside the
-RecyclerView in ToDoListActivity.
-Each task item includes:
-- an optional image
-- task title
-- task description
-- a checkbox to mark the task as completed -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:orientation="vertical"
+    android:padding="10dp">
 
-    <!-- ImageView displays the photo associated with the task.
-    The image is loaded from the URI stored in the database. -->
+    <TextView
+        android:id="@+id/taskListTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/taskListDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/taskListDue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <ImageView
         android:id="@+id/taskListImage"
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:adjustViewBounds="true"
-        android:layout_marginEnd="8dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="#DDDDDD"
+        android:scaleType="fitCenter" />
 
-    <!-- Vertical layout used to display the task text content
-    (title, description, and completion checkbox). -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <!-- Displays the title of the task -->
-        <TextView
-            android:id="@+id/taskListTitle"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/editButton"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
+            android:layout_weight="1"
+            android:text="Edit" />
 
-        <!-- Displays the description of the task -->
-        <TextView
-            android:id="@+id/taskListDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <!-- Checkbox used to mark the task as completed -->
-        <CheckBox
-            android:id="@+id/taskListDone"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/shareButton"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Done"/>
+            android:layout_weight="1"
+            android:text="Share" />
 
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Delete" />
     </LinearLayout>
-
 </LinearLayout>

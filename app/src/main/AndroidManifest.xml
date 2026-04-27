@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -19,6 +23,10 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".LocationPickerActivity"
+            android:exported="false" />
+
         <!-- ToDoListActivity displays the list of tasks.
         It is marked as the launcher activity, meaning it is the first screen shown
         when the application starts. -->
@@ -34,6 +42,7 @@
                 <!-- Makes the app appear in the device launcher -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <!-- FileProvider is required to securely share files between the application

@@ -1,82 +1,70 @@
 package com.example.myandroidapp;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
-
-public class AllTaskFragment extends Fragment {
+public class AllTaskFragment extends Fragment implements TaskListAdapter.ReminderClickListener {
 
     AppDatabase db;
-    RecyclerView recyclerView;
     TaskListAdapter adapter;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_all_task, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        db = Room.databaseBuilder(requireContext(), AppDatabase.class, "task-database")
+                .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
+                .build();
 
-        super.onViewCreated(view, savedInstanceState);
-
-        // 1. Get database
-        db = Room.databaseBuilder(
-                getContext(),
-                AppDatabase.class,
-                "task-database"
-        ).allowMainThreadQueries().build();
-
-        // 2. Setup RecyclerView
-        recyclerView = view.findViewById(R.id.taskRecyclerView);
+        RecyclerView recyclerView = view.findViewById(R.id.taskRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        adapter = new TaskListAdapter(db);
+        adapter = new TaskListAdapter(requireContext(), this);
         recyclerView.setAdapter(adapter);
-
-        // 3. Load data (ALL TASKS)
-        List<Task> tasks = db.taskDao().getAllTasks();
-        adapter.setTasks(tasks);
-
-        // 4. Swipe delete (copied from activity)
-        ItemTouchHelper.SimpleCallback callback =
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-
-                    @Override
-                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        int position = viewHolder.getAdapterPosition();
-                        adapter.deleteTask(position);
-                    }
-                };
-
-        new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
+        loadTasks();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        loadTasks();
+    }
 
-        // Reload tasks from database
-        List<Task> tasks = db.taskDao().getAllTasks();
+    void loadTasks() {
+        if (db != null && adapter != null) {
+            adapter.setTasks(db.taskDao().getAllTasks());
+        }
+    }
 
-        adapter.setTasks(tasks);
+    @Override
+    public void editReminder(Task task) {
+        Intent intent = new Intent(getContext(), MainActivity.class);
+        intent.putExtra("taskId", task.id);
+        startActivity(intent);
+    }
+
+    @Override
+    public void deleteReminder(Task task) {
+        db.taskDao().delete(task);
+        loadTasks();
+    }
+
+    @Override
+    public void shareReminder(Task task) {
+        if (getActivity() instanceof ToDoListActivity) {
+            ((ToDoListActivity) getActivity()).shareReminder(task);
+        }
     }
 }

@@ -10,7 +10,8 @@ import androidx.room.RoomDatabase;
 This class connects the data model (Task) with the Data Access Object (TaskDao). */
 @Database(
         entities = {Task.class}, // Defines the tables stored in the database
-        version = 1 // Database version used for schema management
+        version = 3,
+        exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
     // Provides access to the TaskDao.

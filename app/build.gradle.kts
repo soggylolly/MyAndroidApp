@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -11,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.myandroidapp"
+        applicationId = "com.example.mylocation"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -40,6 +41,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation("com.google.firebase:firebase-firestore:26.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
