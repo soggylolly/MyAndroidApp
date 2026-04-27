@@ -75,6 +75,7 @@ public class ToDoListActivity extends AppCompatActivity {
 
         createNotificationChannel();
         setupSensors();
+        requestNotificationPermission();
 
         loadFragment(allTaskFragment);
 
@@ -94,9 +95,7 @@ public class ToDoListActivity extends AppCompatActivity {
             }
             return false;
         });
-        if (significantMotionSensor == null) {
-            startLocationChecking();
-        }
+        startLocationChecking();
     }
 
     @Override
@@ -109,6 +108,7 @@ public class ToDoListActivity extends AppCompatActivity {
         }
 
         registerMotionSensor();
+        startLocationChecking();
     }
 
     @Override
@@ -239,10 +239,6 @@ public class ToDoListActivity extends AppCompatActivity {
             permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
             permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                permissions.add(Manifest.permission.POST_NOTIFICATIONS);
-            }
-
             ActivityCompat.requestPermissions(
                     this,
                     permissions.toArray(new String[0]),
@@ -255,12 +251,37 @@ public class ToDoListActivity extends AppCompatActivity {
         locationListener = this::checkRemindersNearLocation;
 
         if (locationManager != null) {
-            locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    10000,
-                    10,
-                    locationListener
-            );
+            Location lastLocation = null;
+
+            try {
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER,
+                            10000,
+                            10,
+                            locationListener
+                    );
+                    lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                }
+
+                if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.NETWORK_PROVIDER,
+                            10000,
+                            10,
+                            locationListener
+                    );
+
+                    if (lastLocation == null) {
+                        lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    }
+                }
+            } catch (SecurityException ignored) {
+            }
+
+            if (lastLocation != null) {
+                checkRemindersNearLocation(lastLocation);
+            }
         }
     }
 
@@ -290,6 +311,13 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private void showReminderNotification(Task task) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestNotificationPermission();
+            return;
+        }
+
         Intent intent = new Intent(this, ToDoListActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
@@ -303,6 +331,8 @@ public class ToDoListActivity extends AppCompatActivity {
                 .setContentTitle(task.title)
                 .setContentText(task.description)
                 .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setDefaults(Notification.DEFAULT_ALL)
                 .setAutoCancel(true);
 
         Bitmap bitmap = getReminderBitmap(task);
@@ -313,6 +343,18 @@ public class ToDoListActivity extends AppCompatActivity {
         Notification notification = builder.build();
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(task.id, notification);
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    LOCATION_PERMISSION_CODE
+            );
+        }
     }
 
     private Bitmap getReminderBitmap(Task task) {

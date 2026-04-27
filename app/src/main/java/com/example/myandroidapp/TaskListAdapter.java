@@ -89,7 +89,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
         holder.editButton.setEnabled(!task.shared);
         holder.editButton.setOnClickListener(v -> listener.editReminder(task));
         holder.deleteButton.setOnClickListener(v -> listener.deleteReminder(task));
-        holder.shareButton.setEnabled(!task.shared);
+        holder.shareButton.setEnabled(true);
         holder.shareButton.setOnClickListener(v -> listener.shareReminder(task));
     }
 
