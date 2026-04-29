@@ -19,7 +19,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyAndroidApp">
 
-        <!-- Screen used to add or edit reminders -->
         <!-- MainActivity is used to create a new task.
          android:exported="false" means this activity can only be opened
          from inside the application. -->

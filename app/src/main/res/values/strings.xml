@@ -1,4 +1,3 @@
 <resources>
-    <!-- Name shown under the app icon -->
     <string name="app_name">Reminder App</string>
 </resources>
