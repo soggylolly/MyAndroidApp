@@ -17,6 +17,7 @@ import java.util.List;
 
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskViewHolder> {
 
+    // This sends button clicks back to the fragment
     public interface ReminderClickListener {
         void editReminder(Task task);
         void deleteReminder(Task task);
@@ -27,16 +28,19 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
     private final ReminderClickListener listener;
     private List<Task> tasks = new ArrayList<>();
 
+    // The adapter needs the context and listener to work with the list buttons
     public TaskListAdapter(Context context, ReminderClickListener listener) {
         this.context = context;
         this.listener = listener;
     }
 
     public void setTasks(List<Task> tasks) {
+        // Replace the old list with the new one from the database
         this.tasks = new ArrayList<>(tasks);
         notifyDataSetChanged();
     }
 
+    // This stores all the views for one reminder row
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         TextView desc;
@@ -67,6 +71,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
+        // Get the reminder for this row
         Task task = tasks.get(position);
 
         holder.title.setText(task.title);
@@ -79,6 +84,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
                 : "No location";
         holder.info.setText(source + "\n" + due + "\n" + location);
 
+        // Hide the image box if there is no photo
         if (task.imageUri == null || task.imageUri.isEmpty()) {
             holder.image.setVisibility(View.GONE);
         } else {
@@ -86,6 +92,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
             holder.image.setImageURI(Uri.parse(task.imageUri));
         }
 
+        // Connect the three buttons to edit, share and delete
         holder.editButton.setEnabled(!task.shared);
         holder.editButton.setOnClickListener(v -> listener.editReminder(task));
         holder.deleteButton.setOnClickListener(v -> listener.deleteReminder(task));
@@ -99,6 +106,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
     }
 
     private String emptyText(String text) {
+        // Stops null text showing in the list
         if (text == null || text.isEmpty()) {
             return "";
         }

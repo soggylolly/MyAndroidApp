@@ -42,9 +42,11 @@ import java.util.List;
 
 public class ToDoListActivity extends AppCompatActivity {
 
+    // Codes used for permissions and notifications
     private static final int LOCATION_PERMISSION_CODE = 22;
     private static final String CHANNEL_ID = "reminder_channel";
 
+    // Main objects used by this screen
     AppDatabase db;
     FirebaseFirestore firestore;
     ListenerRegistration listenerRegistration;
@@ -66,19 +68,25 @@ public class ToDoListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_list_layout);
 
+        // Open the local Room database
         db = Room.databaseBuilder(this, AppDatabase.class, "task-database")
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
+
+        // Connect to Firebase so reminders can be shared
         firestore = FirebaseFirestore.getInstance();
         userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
+        // Setup notifications and sensors when the app starts
         createNotificationChannel();
         setupSensors();
         requestNotificationPermission();
 
+        // Show all reminders first
         loadFragment(allTaskFragment);
 
+        // Bottom menu changes between all, mine and shared reminders
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_all) {
@@ -95,18 +103,24 @@ public class ToDoListActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        // Start checking where the user is
         startLocationChecking();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Listen for reminders shared by other users
         listenForSharedReminders();
 
+        // Start the light sensor again when the app is visible
         if (lightSensor != null) {
             sensorManager.registerListener(lightSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
+        // Also restart location checks when the screen comes back
         registerMotionSensor();
         startLocationChecking();
     }
@@ -115,10 +129,12 @@ public class ToDoListActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        // Stop Firebase listener when app is not in front
         if (listenerRegistration != null) {
             listenerRegistration.remove();
         }
 
+        // Stop sensor and location work to save battery
         if (sensorManager != null && lightSensorListener != null) {
             sensorManager.unregisterListener(lightSensorListener);
         }
@@ -129,6 +145,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private void setupSensors() {
+        // Get the sensor manager from Android
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         if (sensorManager == null) {
@@ -139,6 +156,7 @@ public class ToDoListActivity extends AppCompatActivity {
         lightSensorListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
+                // Change the screen brightness based on light level
                 float brightness = Math.min(1f, event.values[0] / 1000f);
                 android.view.WindowManager.LayoutParams params = getWindow().getAttributes();
                 params.screenBrightness = brightness;
@@ -154,6 +172,7 @@ public class ToDoListActivity extends AppCompatActivity {
         motionListener = new TriggerEventListener() {
             @Override
             public void onTrigger(TriggerEvent event) {
+                // If the phone moves, check the location again
                 startLocationChecking();
                 registerMotionSensor();
             }
@@ -167,6 +186,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     public void shareReminder(Task task) {
+        // Save this reminder to Firestore so other users can get it
         task.owner = userId;
         task.shared = false;
 
@@ -180,6 +200,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private void listenForSharedReminders() {
+        // Listen for reminders in Firebase
         listenerRegistration = firestore.collection("reminders")
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) {
@@ -189,6 +210,7 @@ public class ToDoListActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document : value) {
                         Task task = document.toObject(Task.class);
 
+                        // Do not save reminders that belong to this phone
                         if (task.owner == null || task.owner.equals(userId)) {
                             continue;
                         }
@@ -198,6 +220,7 @@ public class ToDoListActivity extends AppCompatActivity {
 
                         Task existing = db.taskDao().getTaskByRemoteId(task.remoteId);
                         if (existing == null) {
+                            // Save shared reminders locally so they show in the list
                             task.id = 0;
                             db.taskDao().insert(task);
                         }
@@ -215,10 +238,12 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     public void openNewTask(View view) {
+        // Opens the add reminder screen
         startActivity(new Intent(this, MainActivity.class));
     }
 
     private void refreshLists() {
+        // Reload the lists after Firebase changes
         if (allTaskFragment.isAdded()) {
             allTaskFragment.loadTasks();
         }
@@ -233,6 +258,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private void startLocationChecking() {
+        // Ask for location permission if needed
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ArrayList<String> permissions = new ArrayList<>();
@@ -250,6 +276,7 @@ public class ToDoListActivity extends AppCompatActivity {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = this::checkRemindersNearLocation;
 
+        // Try to get updates from GPS and network location
         if (locationManager != null) {
             Location lastLocation = null;
 
@@ -279,6 +306,7 @@ public class ToDoListActivity extends AppCompatActivity {
             } catch (SecurityException ignored) {
             }
 
+            // Also check straight away if Android already knows the location
             if (lastLocation != null) {
                 checkRemindersNearLocation(lastLocation);
             }
@@ -286,6 +314,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private void checkRemindersNearLocation(Location currentLocation) {
+        // Go through all reminders and check the distance
         List<Task> tasks = db.taskDao().getAllTasks();
 
         for (Task task : tasks) {
@@ -302,6 +331,7 @@ public class ToDoListActivity extends AppCompatActivity {
                     distance
             );
 
+            // If the user is close, show the notification
             if (distance[0] < 100) {
                 showReminderNotification(task);
                 task.notified = true;
@@ -311,6 +341,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private void showReminderNotification(Task task) {
+        // Android 13 and newer needs notification permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -319,6 +350,8 @@ public class ToDoListActivity extends AppCompatActivity {
         }
 
         Intent intent = new Intent(this, ToDoListActivity.class);
+
+        // This opens the app when the user taps the notification
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
                 task.id,
@@ -335,6 +368,7 @@ public class ToDoListActivity extends AppCompatActivity {
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setAutoCancel(true);
 
+        // Add the photo to the notification if there is one
         Bitmap bitmap = getReminderBitmap(task);
         if (bitmap != null) {
             builder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap));
@@ -346,6 +380,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private void requestNotificationPermission() {
+        // Ask permission for notifications on newer Android phones
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -358,6 +393,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private Bitmap getReminderBitmap(Task task) {
+        // Loads the reminder photo for the notification
         if (task.imageUri == null || task.imageUri.isEmpty()) {
             return null;
         }
@@ -371,6 +407,7 @@ public class ToDoListActivity extends AppCompatActivity {
     }
 
     private void createNotificationChannel() {
+        // Android needs a notification channel before showing notifications
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,

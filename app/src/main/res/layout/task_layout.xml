@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:padding="10dp">
 
+    <!-- Reminder title -->
     <TextView
         android:id="@+id/taskListTitle"
         android:layout_width="match_parent"
@@ -12,16 +13,19 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
+    <!-- Reminder description -->
     <TextView
         android:id="@+id/taskListDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <!-- Due date, time, owner and location info -->
     <TextView
         android:id="@+id/taskListDue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <!-- Reminder photo if one was taken -->
     <ImageView
         android:id="@+id/taskListImage"
         android:layout_width="match_parent"
@@ -29,11 +33,13 @@
         android:background="#DDDDDD"
         android:scaleType="fitCenter" />
 
+    <!-- Buttons for each reminder row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <!-- Opens the reminder for editing -->
         <Button
             android:id="@+id/editButton"
             android:layout_width="0dp"
@@ -41,6 +47,7 @@
             android:layout_weight="1"
             android:text="Edit" />
 
+        <!-- Uploads the reminder to Firebase -->
         <Button
             android:id="@+id/shareButton"
             android:layout_width="0dp"
@@ -48,6 +55,7 @@
             android:layout_weight="1"
             android:text="Share" />
 
+        <!-- Deletes the reminder locally -->
         <Button
             android:id="@+id/deleteButton"
             android:layout_width="0dp"

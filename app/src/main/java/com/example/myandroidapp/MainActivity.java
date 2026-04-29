@@ -31,8 +31,10 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
+    // This number is used when asking Android for location permission
     private static final int LOCATION_PERMISSION_CODE = 33;
 
+    // These variables store the database and the reminder details
     AppDatabase db;
     Task editingTask;
     Uri imageUri;
@@ -54,11 +56,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // This opens the Room database so reminders can be saved
         db = Room.databaseBuilder(this, AppDatabase.class, "task-database")
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
 
+        // These connect the Java code to the views in the XML layout
         titleInput = findViewById(R.id.taskTitleView);
         descriptionInput = findViewById(R.id.taskDescriptionView);
         dueDateInput = findViewById(R.id.taskDueDateView);
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         Button saveButton = findViewById(R.id.saveTaskButton);
 
+        // This gets the result after the user takes a photo
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -76,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
+        // This gets the latitude and longitude back from the map screen
         mapLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -88,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
+        // If a task id is sent to this screen then the user is editing a reminder
         int taskId = getIntent().getIntExtra("taskId", -1);
         if (taskId != -1) {
             editingTask = db.taskDao().getTaskById(taskId);
@@ -102,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Fill the boxes with the reminder details already saved
         TextView formTitle = findViewById(R.id.formTitle);
         formTitle.setText("Edit Reminder");
 
@@ -122,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveReminder() {
+        // Get the values typed by the user
         String title = titleInput.getText().toString().trim();
         String description = descriptionInput.getText().toString().trim();
         String dueDate = dueDateInput.getText().toString().trim();
@@ -137,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Either make a new reminder or update the old one
         Task task = editingTask == null ? new Task() : editingTask;
         task.title = title;
         task.description = description;
@@ -153,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
             task.imageUri = imageUri.toString();
         }
 
+        // Save the reminder into the local database
         if (editingTask == null) {
             db.taskDao().insert(task);
         } else {
@@ -164,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onCameraClick(View view) {
+        // Create a file for the camera photo
         File imageFile = new File(getFilesDir(), System.currentTimeMillis() + ".jpg");
         imageUri = FileProvider.getUriForFile(
                 this,
@@ -177,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openDatePicker(View view) {
+        // Shows the normal Android date picker
         Calendar calendar = Calendar.getInstance();
 
         DatePickerDialog dialog = new DatePickerDialog(
@@ -192,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openTimePicker(View view) {
+        // Shows the normal Android time picker
         Calendar calendar = Calendar.getInstance();
 
         TimePickerDialog dialog = new TimePickerDialog(
@@ -207,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void saveCurrentLocation(View view) {
+        // Ask for permission before trying to use location
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
@@ -220,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
 
+        // Try GPS first, then network location if GPS is empty
         if (locationManager != null) {
             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location == null) {
@@ -239,10 +255,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openMap(View view) {
+        // Opens the map activity so the user can pick a place
         mapLauncher.launch(new Intent(this, LocationPickerActivity.class));
     }
 
     private void updateLocationText() {
+        // Updates the text so the user can see if a location is saved
         if (hasLocation) {
             locationText.setText("Location: " + latitude + ", " + longitude);
         } else {

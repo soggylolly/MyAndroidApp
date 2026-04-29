@@ -15,12 +15,14 @@ import org.osmdroid.views.overlay.Marker;
 
 public class LocationPickerActivity extends AppCompatActivity {
 
+    // This is the map view from the XML layout
     MapView mapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Loads the osmdroid settings for the map
         Configuration.getInstance().load(
                 getApplicationContext(),
                 getSharedPreferences("osmdroid", MODE_PRIVATE)
@@ -33,6 +35,7 @@ public class LocationPickerActivity extends AppCompatActivity {
         mapView.getController().setZoom(16.0);
         mapView.getController().setCenter(new GeoPoint(52.195, -2.225));
 
+        // This detects when the user presses on the map
         MapEventsOverlay overlay = new MapEventsOverlay(new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
@@ -41,12 +44,14 @@ public class LocationPickerActivity extends AppCompatActivity {
 
             @Override
             public boolean longPressHelper(GeoPoint p) {
+                // Put a marker on the map where the user pressed
                 Marker marker = new Marker(mapView);
                 marker.setPosition(p);
                 marker.setTitle("Reminder location");
                 mapView.getOverlays().add(marker);
                 mapView.invalidate();
 
+                // Send the selected location back to MainActivity
                 Intent result = new Intent();
                 result.putExtra("latitude", p.getLatitude());
                 result.putExtra("longitude", p.getLongitude());

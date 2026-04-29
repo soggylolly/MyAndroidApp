@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    // Google services is needed so Firebase can work
     id("com.google.gms.google-services")
 }
 
@@ -12,6 +13,7 @@ android {
     }
 
     defaultConfig {
+        // This matches the Firebase google-services.json package name
         applicationId = "com.example.mylocation"
         minSdk = 26
         targetSdk = 36
@@ -41,7 +43,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    // osmdroid is used for the map picker
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+    // Firestore is used for sharing reminders
     implementation("com.google.firebase:firebase-firestore:26.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

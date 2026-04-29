@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".PendingTaskFragment">
 
+    <!-- This list is reused for the Shared tab -->
     <androidx.recyclerview.widget.RecyclerView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/taskRecyclerView"

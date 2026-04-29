@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissions needed for Firebase, location reminders and notifications -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -18,6 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyAndroidApp">
 
+        <!-- Screen used to add or edit reminders -->
         <!-- MainActivity is used to create a new task.
          android:exported="false" means this activity can only be opened
          from inside the application. -->
@@ -25,6 +27,7 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <!-- Screen used for picking a location on the map -->
         <activity
             android:name=".LocationPickerActivity"
             android:exported="false" />

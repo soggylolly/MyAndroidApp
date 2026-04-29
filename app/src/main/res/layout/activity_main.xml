@@ -4,12 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Main vertical form for adding or editing a reminder -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="12dp">
 
+        <!-- Page title changes to Edit Reminder when editing -->
         <TextView
             android:id="@+id/formTitle"
             android:layout_width="match_parent"
@@ -18,12 +20,14 @@
             android:textSize="22sp"
             android:textStyle="bold" />
 
+        <!-- User types the reminder title here -->
         <EditText
             android:id="@+id/taskTitleView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title" />
 
+        <!-- User types a longer description here -->
         <EditText
             android:id="@+id/taskDescriptionView"
             android:layout_width="match_parent"
@@ -31,6 +35,7 @@
             android:gravity="top"
             android:hint="Description" />
 
+        <!-- Date box opens DatePickerDialog from Java -->
         <EditText
             android:id="@+id/taskDueDateView"
             android:layout_width="match_parent"
@@ -40,6 +45,7 @@
             android:hint="Due Date"
             android:onClick="openDatePicker" />
 
+        <!-- Time box opens TimePickerDialog from Java -->
         <EditText
             android:id="@+id/taskDueTimeView"
             android:layout_width="match_parent"
@@ -49,6 +55,7 @@
             android:hint="Due Time"
             android:onClick="openTimePicker" />
 
+        <!-- Opens the phone camera -->
         <Button
             android:id="@+id/imageButton"
             android:layout_width="match_parent"
@@ -56,6 +63,7 @@
             android:onClick="onCameraClick"
             android:text="Take Photo" />
 
+        <!-- Shows the photo after the camera returns -->
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
@@ -63,6 +71,7 @@
             android:background="#DDDDDD"
             android:scaleType="fitCenter" />
 
+        <!-- Saves the current GPS or network location -->
         <Button
             android:id="@+id/locationButton"
             android:layout_width="match_parent"
@@ -70,6 +79,7 @@
             android:onClick="saveCurrentLocation"
             android:text="Use Current Location" />
 
+        <!-- Opens the simple map picker screen -->
         <Button
             android:id="@+id/mapButton"
             android:layout_width="match_parent"
@@ -77,6 +87,7 @@
             android:onClick="openMap"
             android:text="Choose Location On Map" />
 
+        <!-- Shows the saved latitude and longitude -->
         <TextView
             android:id="@+id/locationText"
             android:layout_width="match_parent"
@@ -84,6 +95,7 @@
             android:padding="8dp"
             android:text="No location saved" />
 
+        <!-- Saves the reminder to Room database -->
         <Button
             android:id="@+id/saveTaskButton"
             android:layout_width="match_parent"

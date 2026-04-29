@@ -23,4 +23,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "MyAndroidApp"
+// Only the main app module is used now
 include(":app")

@@ -1,15 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Shows all reminders -->
     <item
         android:id="@+id/nav_all"
         android:title="All"
         android:icon="@android:drawable/ic_menu_agenda" />
 
+    <!-- Shows reminders created by this phone -->
     <item
         android:id="@+id/nav_completed"
         android:title="Mine"
         android:icon="@android:drawable/ic_menu_myplaces" />
 
+    <!-- Shows reminders shared from Firebase -->
     <item
         android:id="@+id/nav_pending"
         android:title="Shared"

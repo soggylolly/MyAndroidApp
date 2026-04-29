@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!-- Simple title at the top of the app -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,6 +16,7 @@
         android:textSize="22sp"
         android:textStyle="bold" />
 
+    <!-- Button to open the add reminder screen -->
     <Button
         android:id="@+id/newTaskButton"
         android:layout_width="match_parent"
@@ -22,12 +24,14 @@
         android:onClick="openNewTask"
         android:text="Add Reminder" />
 
+    <!-- Fragments for all, mine and shared reminders appear here -->
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <!-- Bottom menu from worksheet navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
